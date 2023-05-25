@@ -1,39 +1,51 @@
-"use strict"
+"use strict";
 
 require('dotenv').config();
 const express = require("express");
 const cors = require('cors');
-const { response } = require('express');
-const data = require('./data/weather.json');
+const axios = require("axios");
+const PORT = process.env.PORT || 3001;
 
-//inilizes app
+// Initializes app
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: "https://luitheexplorer.netlify.app/"
+}));
 
-//configure routes
-app.get('/weather', (request, response) => {
-    //query parameters
-    let {lat, lon, searchQuery} = request.query;
-    const forecastData = data.find(destination => {
-        if (lat == destination.lat || lon == destination.lon || searchQuery == destination.city_name){
-            return true;
-        } else {
-            return false;
-        }
-    });
-        if (forecastData === undefined){
-            response.status(400).send({message:"400 Not Found"});
-            return
-        }
+// Configure routes
+app.get('/weather', async (request, response) => {
+    console.log(process.env.WEATHER_APP_API);
+    let forecastData = await axios.get(`http://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_APP_API}&city=${request.query.searchQuery}`);
 
-    const forecaster = forecastData.data.map(obj => {
-        return new Forecast(obj.valid_date, obj.weather.description, obj.high_temp, obj.low_temp)
+    const forecaster = forecastData.data.data.slice(0, 3).map(obj => {
+        return new Forecast(obj.valid_date, obj.weather.description, obj.high_temp, obj.low_temp);
     });
 
-    response.send(forecaster)
+    response.send(forecaster);
 });
 
+app.get("/movie", async (request, response) => {
+    let movie = request.query.movie;
+    let movieResponse = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${movie}`, { headers });
+
+    const watcher = movieResponse.data.results.map(obj => {
+        return new Movie(obj.title, obj.overview, obj.vote_average, obj.popularity, obj.release_date, obj.poster_path);
+    });
+
+    response.send(watcher);
+});
+
+class Movie {
+    constructor(overview, popularity, poster_path, release_date, title, vote_average) {
+        this.title = title;
+        this.overview = overview;
+        this.vote_average = vote_average;
+        this.popularity = popularity;
+        this.release_date = release_date;
+        this.poster_path = poster_path;
+    }
+}
 
 class Forecast {
     constructor(date, description, high_temp, low_temp) {
@@ -44,5 +56,5 @@ class Forecast {
     }
 }
 
-//start app
-app.listen(3001, () => console.log(`listening on 3001`));
+// Start app
+app.listen(PORT, () => console.log(`listening on ${PORT}`));
