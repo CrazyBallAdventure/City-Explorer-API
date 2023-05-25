@@ -9,9 +9,7 @@ const PORT = process.env.PORT || 3001;
 // Initializes app
 const app = express();
 
-app.use(cors({
-    origin: "https://luitheexplorer.netlify.app/"
-}));
+app.use(cors());
 
 // Configure routes
 app.get('/weather', async (request, response) => {
