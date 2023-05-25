@@ -27,7 +27,7 @@ app.get('/weather', async (request, response) => {
 
 app.get("/movie", async (request, response) => {
     let movie = request.query.movie;
-    let movieResponse = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${movie}`, { headers });
+    let movieResponse = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${movie}`);
 
     const watcher = movieResponse.data.results.map(obj => {
         return new Movie(obj.title, obj.overview, obj.vote_average, obj.popularity, obj.release_date, obj.poster_path);
