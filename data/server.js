@@ -35,7 +35,7 @@ app.get("/movies", async (request, response) => {
 });
 
 class Movie {
-    constructor(overview, popularity, poster_path, release_date, title, vote_average) {
+    constructor(title, overview, vote_average, popularity, release_date, poster_path) {
         this.title = title;
         this.overview = overview;
         this.vote_average = vote_average;
