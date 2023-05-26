@@ -23,16 +23,17 @@ app.get('/weather', async (request, response) => {
     response.send(forecaster);
 });
 
-app.get("/movie", async (request, response) => {
-    let movie = request.query.movie;
-    let movieResponse = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${movie}`);
+app.get("/movies", async (request, response) => {
+    let searchQuery = request.query.searchquery;
+    let movieResponse = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${searchQuery}`);
 
-    const watcher = movieResponse.data.results.map(obj => {
+    const movies = movieResponse.data.results.map(obj => {
         return new Movie(obj.overview, obj.popularity, obj.poster_path, obj.release_date, obj.title, obj.vote_average);
     });
 
-    response.send(watcher);
+    response.send(movies);
 });
+
 
 
 
