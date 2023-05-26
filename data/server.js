@@ -28,11 +28,12 @@ app.get("/movies", async (request, response) => {
     let movieResponse = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${movie}`);
 
     const watcher = movieResponse.data.results.map(obj => {
-        return new Movie(obj.title, obj.overview, obj.vote_average, obj.popularity, obj.release_date, obj.poster_path);
+        return new Movie(obj.overview, obj.popularity, obj.poster_path, obj.release_date, obj.title, obj.vote_average);
     });
 
     response.send(watcher);
 });
+
 
 class Movie {
     constructor(title, overview, vote_average, popularity, release_date, poster_path) {
