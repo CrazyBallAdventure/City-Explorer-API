@@ -8,6 +8,9 @@ const PORT = process.env.PORT || 3001;
 const getWeather = require('./weather')
 const getMovie = require('./movie')
 
+let weathercache = {}
+let moviecache = {}
+
 // Initializes app
 const app = express();
 
@@ -15,15 +18,39 @@ app.use(cors());
 
 // Configure routes
 app.get('/weather', async (request, response) => {
-    const forecaster = await getWeather(request.query.searchQuery);
-    response.send(forecaster);
+    let city = request.query.searchQuery
+    let forecastData = weathercache[city]
+
+    if(forecastData === undefined)
+    {
+        console.log("CACHE MISS")
+        forecastData = await getWeather(request.query.searchQuery);
+        weathercache[city] = forecastData
+    }else{
+        console.log("CACHE HIT")
+    }
+    response.send(forecastData)
+
 });
 
 app.get("/movies", async (request, response) => {
-    let searchQuery = request.query.searchQuery;
-    let movies = await getMovie(searchQuery)
+    let movie = request.query.searchQuery
+    let movieData = moviecache[city]
 
-    response.send(movies);
+    if(movieData === undefined)
+    {
+        console.log("CACHE MISS")
+        movieData = await getMovie(request.query.searchQuery);
+        moviecache[city] = movieData
+    }else{
+        console.log("CACHE HIT")
+    }
+    response.send(movieData)
+
+    // let searchQuery = request.query.searchQuery;
+    // let movies = await getMovie(searchQuery)
+
+    // response.send(movies);
 });
 
 
